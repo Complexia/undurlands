@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  has_many :microposts
   attr_accessor :remember_token
   before_save { self.email = email.downcase }
   validates :name,  presence: true, length: { maximum: 50 }
@@ -21,10 +22,16 @@ class User < ApplicationRecord
     SecureRandom.urlsafe_base64
   end
 
+
+
   # Remembers a user in the database for use in persistent sessions.
   def remember
     self.remember_token = User.new_token
     update_attribute(:remember_digest, User.digest(remember_token))
+  end
+
+  def feed
+    Micropost.where("user_id = ?", id)
   end
 
   # Returns true if the given token matches the digest.
